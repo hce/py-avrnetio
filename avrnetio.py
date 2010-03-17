@@ -32,11 +32,11 @@ class AVRNetIO(object):
 
     def getPort(self, portnumber):
         self.s.sendall("GETPORT %d\r\n" % portnumber)
-        return self.expect("^[01]$")
+        return self.expect("^[01]$", int)
 
     def getADC(self, portnumber):
         self.s.sendall("GETADC %d\r\n" % portnumber)
-        return self.expect("^[0-9]{1:4}$")
+        return self.expect("^[0-9]{1,4}$", int)
 
     def setPort(self, portnumber, value):
         self.s.sendall("SETPORT %d.%s\r\n" % (portnumber, \
@@ -56,11 +56,11 @@ class AVRNetIO(object):
         self.s.sendall("WRITELCD %d.%s" % (line, text))
         self.expect("^ACK$")
 
-    def expect(self, regexp):
-        response = self.sockfile.readline()
+    def expect(self, regexp, typ=lambda __unused__: None):
+        response = self.sockfile.readline()[:-2]
         try:
             sane(response, regexp)
         except InsaneExpressionException:
             raise ErrorRepliedException(response)
-        return response
+        return typ(response)
 
