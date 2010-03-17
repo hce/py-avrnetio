@@ -11,7 +11,15 @@ def doit():
     for i in range(0, 16):
         x.setPort((i % 8) + 1, i < 8)
         print "Set port %d to %s." % ((i % 8) + 1, i < 8)
-        time.sleep(1)
+        time.sleep(0.1)
+
+    print "Clearing LCD"
+    x.clearLCD(1)
+    x.clearLCD(2)
+    print "Writing Hello World."
+    x.writeLCD(1, "Hello")
+    x.writeLCD(2, "World")
+    print "Done."
 
 if __name__ == '__main__':
     doit()

@@ -22,10 +22,12 @@ sane = Sanitizer().isSane
 
 class AVRNetIO(object):
     def __init__(self, address):
+        self.lcdinitialized = False
         self.address = address
         self.ensureConnected()
 
     def ensureConnected(self):
+        self.lcdinitialized = False
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect(self.address)
         self.sockfile = self.s.makefile('r')
@@ -42,6 +44,13 @@ class AVRNetIO(object):
         self.s.sendall("SETPORT %d.%s\r\n" % (portnumber, \
                 "1" if value else "0"))
         self.expect("^ACK$")
+
+    def ensureLCDInitialized(self):
+        if self.lcdinitialized:
+            return
+        self.s.sendall("INITLCD\r\n")
+        self.expect("^ACK$")
+        self.lcdinitialized = True
 
     def clearLCD(self, line):
         self.ensureLCDInitialized()
